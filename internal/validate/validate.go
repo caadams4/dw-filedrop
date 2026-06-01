@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"dw-filedrop/internal/schema"
 )
@@ -103,7 +104,24 @@ func checkValue(c schema.Column, v string) string {
 		if !decimalRe.MatchString(v) {
 			return "not a decimal with 2 places"
 		}
-	// TODO date + enum types
+	case c.Type == "date":
+		if _, err := time.Parse("2006-01-02", v); err != nil {
+			return "not a date (YYYY-MM-DD)"
+		}
+	case c.Type == "month":
+		if _, err := time.Parse("2006-01", v); err != nil {
+			return "not a month (YYYY-MM)"
+		}
+	case strings.HasPrefix(c.Type, "enum:"):
+		ok := false
+		for _, e := range c.Enum {
+			if strings.EqualFold(e, v) {
+				ok = true
+			}
+		}
+		if !ok {
+			return "not one of " + strings.Join(c.Enum, "|")
+		}
 	}
 	return ""
 }
