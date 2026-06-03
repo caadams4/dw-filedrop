@@ -1,0 +1,5 @@
+employee_id,surname,forename,tax_id,pay_period,gross_pay,tax,ee_contrib,er_contrib,cost_centre
+SO104233,Hargreave,Imogen,QQ123456C,2026-06,3250.00,512.40,162.50,243.75,CC1040
+SO104234,Lindqvist,Oskar,QQ234567A,2026-06,4100.00,720.80,205.00,307.50,CC1040
+SO104240,Dekker,Femke,123456782,2026-06,3010.00,455.10,150.50,225.75,CC2010
+SO104241,Janssen,Pieter,234567891,2026-06,2875.50,401.20,143.78,215.66,CC2010
