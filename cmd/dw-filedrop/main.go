@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 
+	"dw-filedrop/internal/encrypt"
 	"dw-filedrop/internal/schema"
 	"dw-filedrop/internal/validate"
 )
@@ -20,6 +21,7 @@ const (
 	exitUsage   = 2
 	exitInvalid = 3
 	exitSchema  = 4
+	exitEncrypt = 5
 )
 
 func main() {
@@ -28,6 +30,7 @@ func main() {
 
 func usage(w io.Writer) {
 	fmt.Fprintln(w, "usage: dw-filedrop validate [-schema FILE] FILE.csv")
+	fmt.Fprintln(w, "       dw-filedrop encrypt [-recipient R] FILE.csv")
 }
 
 func run(args []string, out, errw io.Writer) int {
@@ -38,6 +41,8 @@ func run(args []string, out, errw io.Writer) int {
 	switch args[0] {
 	case "validate":
 		return cmdValidate(args[1:], out, errw)
+	case "encrypt":
+		return cmdEncrypt(args[1:], out, errw)
 	case "version":
 		fmt.Fprintln(out, "dw-filedrop", version)
 		return exitOK
@@ -58,6 +63,26 @@ func cmdValidate(args []string, out, errw io.Writer) int {
 		return exitUsage
 	}
 	return checkFile(fs.Arg(0), *schemaPath, out)
+}
+
+func cmdEncrypt(args []string, out, errw io.Writer) int {
+	fs := flag.NewFlagSet("encrypt", flag.ContinueOnError)
+	fs.SetOutput(errw)
+	recipient := fs.String("recipient", os.Getenv("DW_PGP_RECIPIENT"), "pgp recipient (key id or email)")
+	if err := fs.Parse(args); err != nil {
+		return exitUsage
+	}
+	if fs.NArg() != 1 || *recipient == "" {
+		usage(errw)
+		return exitUsage
+	}
+	p, err := encrypt.File(fs.Arg(0), *recipient)
+	if err != nil {
+		fmt.Fprintln(errw, err)
+		return exitEncrypt
+	}
+	fmt.Fprintln(out, p)
+	return exitOK
 }
 
 func checkFile(path, schemaPath string, out io.Writer) int {
