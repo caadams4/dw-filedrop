@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
+	"dw-filedrop/internal/config"
 	"dw-filedrop/internal/encrypt"
 	"dw-filedrop/internal/schema"
+	"dw-filedrop/internal/upload"
 	"dw-filedrop/internal/validate"
 )
 
@@ -22,6 +25,8 @@ const (
 	exitInvalid = 3
 	exitSchema  = 4
 	exitEncrypt = 5
+	exitUpload  = 6
+	exitConfig  = 7
 )
 
 func main() {
@@ -31,6 +36,7 @@ func main() {
 func usage(w io.Writer) {
 	fmt.Fprintln(w, "usage: dw-filedrop validate [-schema FILE] FILE.csv")
 	fmt.Fprintln(w, "       dw-filedrop encrypt [-recipient R] FILE.csv")
+	fmt.Fprintln(w, "       dw-filedrop send [-schema FILE] FILE.csv")
 }
 
 func run(args []string, out, errw io.Writer) int {
@@ -43,6 +49,8 @@ func run(args []string, out, errw io.Writer) int {
 		return cmdValidate(args[1:], out, errw)
 	case "encrypt":
 		return cmdEncrypt(args[1:], out, errw)
+	case "send":
+		return cmdSend(args[1:], out, errw)
 	case "version":
 		fmt.Fprintln(out, "dw-filedrop", version)
 		return exitOK
@@ -82,6 +90,40 @@ func cmdEncrypt(args []string, out, errw io.Writer) int {
 		return exitEncrypt
 	}
 	fmt.Fprintln(out, p)
+	return exitOK
+}
+
+func cmdSend(args []string, out, errw io.Writer) int {
+	fs := flag.NewFlagSet("send", flag.ContinueOnError)
+	fs.SetOutput(errw)
+	schemaPath := fs.String("schema", defaultSchema, "schema file")
+	if err := fs.Parse(args); err != nil {
+		return exitUsage
+	}
+	if fs.NArg() != 1 {
+		usage(errw)
+		return exitUsage
+	}
+	path := fs.Arg(0)
+	if rc := checkFile(path, *schemaPath, out); rc != exitOK {
+		return rc
+	}
+	cfg, err := config.FromEnv()
+	if err != nil {
+		fmt.Fprintln(errw, err)
+		return exitConfig
+	}
+	enc, err := encrypt.File(path, cfg.Recipient)
+	if err != nil {
+		fmt.Fprintln(errw, err)
+		return exitEncrypt
+	}
+	if err := upload.Put(cfg.Target(), enc); err != nil {
+		fmt.Fprintln(errw, err)
+		return exitUpload
+	}
+	os.Remove(enc)
+	fmt.Fprintf(out, "sent %s to %s:%s\n", filepath.Base(enc), cfg.Host, cfg.RemoteDir)
 	return exitOK
 }
 
