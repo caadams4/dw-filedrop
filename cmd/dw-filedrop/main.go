@@ -19,16 +19,6 @@ const version = "0.1.0"
 
 const defaultSchema = "schema/payroll_v5.csv"
 
-const (
-	exitOK      = 0
-	exitUsage   = 2
-	exitInvalid = 3
-	exitSchema  = 4
-	exitEncrypt = 5
-	exitUpload  = 6
-	exitConfig  = 7
-)
-
 func main() {
 	os.Exit(run(os.Args[1:], os.Stdout, os.Stderr))
 }
