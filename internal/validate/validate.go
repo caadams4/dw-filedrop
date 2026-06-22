@@ -115,7 +115,7 @@ func checkValue(c schema.Column, v string) string {
 	case strings.HasPrefix(c.Type, "enum:"):
 		ok := false
 		for _, e := range c.Enum {
-			if strings.EqualFold(e, v) {
+			if e == v {
 				ok = true
 			}
 		}

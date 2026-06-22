@@ -42,7 +42,7 @@ func TestBadV5(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	wantLines := []int{3, 4, 5, 6}
+	wantLines := []int{2, 3, 4, 5, 6}
 	if len(probs) != len(wantLines) {
 		t.Fatalf("want %d problems, got %d: %v", len(wantLines), len(probs), probs)
 	}
@@ -50,6 +50,18 @@ func TestBadV5(t *testing.T) {
 		if p.Line != wantLines[i] {
 			t.Errorf("problem %d on line %d, want %d (%s)", i, p.Line, wantLines[i], p)
 		}
+	}
+}
+
+func TestCountryIsCaseSensitive(t *testing.T) {
+	in := "employee_id,surname,forename,country,tax_id,pay_period,pay_date,gross_pay,tax,ee_contrib,er_contrib,cost_centre,pension_scheme\n" +
+		"SO104301,Okafor,Chidi,gb,QQ223344A,2026-07,2026-07-17,2890.00,401.20,,,CC1040,\n"
+	probs, _, err := Check(strings.NewReader(in), load(t, "payroll_v5.csv"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(probs) != 1 || probs[0].Column != "country" {
+		t.Fatalf("want one country problem, got %v", probs)
 	}
 }
 

@@ -15,7 +15,7 @@ import (
 	"dw-filedrop/internal/validate"
 )
 
-const version = "1.0.0"
+const version = "1.0.1"
 
 const defaultSchema = "schema/payroll_v5.csv"
 
