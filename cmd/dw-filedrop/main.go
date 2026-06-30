@@ -123,6 +123,9 @@ func checkFile(path, schemaPath string, out io.Writer) int {
 		fmt.Fprintln(out, "schema:", err)
 		return exitSchema
 	}
+	if s.Version != "5" {
+		fmt.Fprintf(out, "warning: schema v%s is not accepted by Drovewell from 1 Jul 2026\n", s.Version)
+	}
 	f, err := os.Open(path)
 	if err != nil {
 		fmt.Fprintln(out, err)
