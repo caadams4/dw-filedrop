@@ -2,6 +2,8 @@
 package validate
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/csv"
 	"errors"
 	"fmt"
@@ -32,7 +34,12 @@ func (p Problem) String() string {
 
 // Check reads r and returns every problem found and the number of data rows seen.
 func Check(r io.Reader, s *schema.Schema) ([]Problem, int, error) {
-	cr := csv.NewReader(r)
+	// Excel "CSV UTF-8" puts a BOM on the front
+	br := bufio.NewReader(r)
+	if b, err := br.Peek(3); err == nil && bytes.Equal(b, []byte{0xEF, 0xBB, 0xBF}) {
+		br.Discard(3)
+	}
+	cr := csv.NewReader(br)
 	cr.FieldsPerRecord = -1
 
 	header, err := cr.Read()

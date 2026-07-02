@@ -65,6 +65,14 @@ func TestCountryIsCaseSensitive(t *testing.T) {
 	}
 }
 
+func TestBOM(t *testing.T) {
+	in := "\xef\xbb\xbfemployee_id,surname,forename,country,tax_id,pay_period,pay_date,gross_pay,tax,ee_contrib,er_contrib,cost_centre,pension_scheme\n"
+	probs, n, err := Check(strings.NewReader(in), load(t, "payroll_v5.csv"))
+	if err != nil || len(probs) != 0 || n != 0 {
+		t.Fatalf("got %v rows=%d err=%v", probs, n, err)
+	}
+}
+
 func TestWrongHeader(t *testing.T) {
 	probs, _, err := Check(strings.NewReader("a,b,c\n1,2,3\n"), load(t, "payroll_v5.csv"))
 	if err != nil {
