@@ -96,6 +96,9 @@ func checkValue(c schema.Column, v string) string {
 		}
 		return ""
 	}
+	if v != strings.TrimSpace(v) {
+		return "leading or trailing space"
+	}
 	if c.MaxLen > 0 && len(v) > c.MaxLen {
 		return fmt.Sprintf("longer than %d", c.MaxLen)
 	}
