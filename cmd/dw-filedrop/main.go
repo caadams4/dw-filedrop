@@ -26,7 +26,7 @@ func main() {
 func usage(w io.Writer) {
 	fmt.Fprintln(w, "usage: dw-filedrop validate [-schema FILE] FILE.csv")
 	fmt.Fprintln(w, "       dw-filedrop encrypt [-recipient R] FILE.csv")
-	fmt.Fprintln(w, "       dw-filedrop send [-schema FILE] FILE.csv")
+	fmt.Fprintln(w, "       dw-filedrop send [-schema FILE] [-dry-run] FILE.csv")
 }
 
 func run(args []string, out, errw io.Writer) int {
@@ -87,6 +87,7 @@ func cmdSend(args []string, out, errw io.Writer) int {
 	fs := flag.NewFlagSet("send", flag.ContinueOnError)
 	fs.SetOutput(errw)
 	schemaPath := fs.String("schema", defaultSchema, "schema file")
+	dry := fs.Bool("dry-run", false, "validate and check config, then stop")
 	if err := fs.Parse(args); err != nil {
 		return exitUsage
 	}
@@ -102,6 +103,10 @@ func cmdSend(args []string, out, errw io.Writer) int {
 	if err != nil {
 		fmt.Fprintln(errw, err)
 		return exitConfig
+	}
+	if *dry {
+		fmt.Fprintf(out, "dry run: would encrypt for %s and upload to %s:%s\n", cfg.Recipient, cfg.Host, cfg.RemoteDir)
+		return exitOK
 	}
 	enc, err := encrypt.File(path, cfg.Recipient)
 	if err != nil {

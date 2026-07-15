@@ -5,7 +5,7 @@ drop it on sftp.drovewell.com.
 
     dw-filedrop validate [-schema FILE] FILE.csv
     dw-filedrop encrypt  [-recipient R] FILE.csv
-    dw-filedrop send     [-schema FILE] FILE.csv
+    dw-filedrop send     [-schema FILE] [-dry-run] FILE.csv
     dw-filedrop version
 
 Flags go before the file name (Go flag package, not my fault).
@@ -16,6 +16,7 @@ Flags go before the file name (Go flag package, not my fault).
 |---|---|---|
 | -schema | validate, send | schema/payroll_v5.csv |
 | -recipient | encrypt | $DW_PGP_RECIPIENT |
+| -dry-run | send | off |
 
 ## Config
 
