@@ -15,7 +15,7 @@ import (
 	"dw-filedrop/internal/validate"
 )
 
-const version = "1.0.2"
+const version = "1.1.0"
 
 const defaultSchema = "schema/payroll_v5.csv"
 
@@ -113,7 +113,7 @@ func cmdSend(args []string, out, errw io.Writer) int {
 		fmt.Fprintln(errw, err)
 		return exitEncrypt
 	}
-	if err := upload.Put(cfg.Target(), enc); err != nil {
+	if err := upload.PutRetry(cfg.Target(), enc, 3); err != nil {
 		fmt.Fprintln(errw, err)
 		return exitUpload
 	}

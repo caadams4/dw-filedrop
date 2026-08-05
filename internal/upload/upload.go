@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Target says where and as whom to upload.
@@ -17,6 +18,21 @@ type Target struct {
 	User      string
 	KeyFile   string
 	RemoteDir string
+}
+
+// PutRetry calls Put up to attempts times with a growing pause between tries.
+// The endpoint drops connections now and then around the 17th-18th.
+func PutRetry(t Target, local string, attempts int) error {
+	var err error
+	for i := 1; i <= attempts; i++ {
+		if err = Put(t, local); err == nil {
+			return nil
+		}
+		if i < attempts {
+			time.Sleep(time.Duration(i*i) * 5 * time.Second)
+		}
+	}
+	return fmt.Errorf("after %d attempts: %w", attempts, err)
 }
 
 // Put uploads local as <name>.part and renames it when done, so the
