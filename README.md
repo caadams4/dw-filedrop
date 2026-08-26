@@ -22,7 +22,8 @@ Flags go before the file name (Go flag package, not my fault).
 
 Env only, see .env.example. send needs DW_SFTP_HOST, DW_SFTP_USER,
 DW_SFTP_KEY_FILE and DW_PGP_RECIPIENT. DW_SFTP_PORT defaults to 22,
-DW_SFTP_DIR to /incoming.
+DW_SFTP_DIR to /incoming. DW_KNOWN_HOSTS (optional) points sftp at a
+separate known_hosts file.
 
 Needs `gpg` and `sftp` on PATH.
 

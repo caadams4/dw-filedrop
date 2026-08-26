@@ -18,6 +18,7 @@ type Config struct {
 	KeyFile   string
 	RemoteDir string
 	Recipient string
+	KnownHosts string
 }
 
 // FromEnv builds a Config and names every missing variable at once.
@@ -28,6 +29,7 @@ func FromEnv() (*Config, error) {
 		KeyFile:   os.Getenv("DW_SFTP_KEY_FILE"),
 		RemoteDir: os.Getenv("DW_SFTP_DIR"),
 		Recipient: os.Getenv("DW_PGP_RECIPIENT"),
+		KnownHosts: os.Getenv("DW_KNOWN_HOSTS"),
 		Port:      22,
 	}
 	if c.RemoteDir == "" {
@@ -65,5 +67,6 @@ func (c *Config) Target() upload.Target {
 		User:      c.User,
 		KeyFile:   c.KeyFile,
 		RemoteDir: c.RemoteDir,
+		KnownHosts: c.KnownHosts,
 	}
 }

@@ -18,6 +18,7 @@ type Target struct {
 	User      string
 	KeyFile   string
 	RemoteDir string
+	KnownHosts string
 }
 
 // PutRetry calls Put up to attempts times with a growing pause between tries.
@@ -53,6 +54,9 @@ func Put(t Target, local string) error {
 	}
 
 	args := []string{"-q", "-b", batch.Name(), "-P", strconv.Itoa(t.Port), "-i", t.KeyFile, "-o", "BatchMode=yes"}
+	if t.KnownHosts != "" {
+		args = append(args, "-o", "UserKnownHostsFile="+t.KnownHosts)
+	}
 	args = append(args, t.User+"@"+t.Host)
 	out, err := exec.Command("sftp", args...).CombinedOutput()
 	if err != nil {
