@@ -12,25 +12,25 @@ import (
 
 // Config holds everything send needs. No secrets in here: KeyFile is a path.
 type Config struct {
-	Host      string
-	Port      int
-	User      string
-	KeyFile   string
-	RemoteDir string
-	Recipient string
+	Host       string
+	Port       int
+	User       string
+	KeyFile    string
+	RemoteDir  string
+	Recipient  string
 	KnownHosts string
 }
 
 // FromEnv builds a Config and names every missing variable at once.
 func FromEnv() (*Config, error) {
 	c := &Config{
-		Host:      os.Getenv("DW_SFTP_HOST"),
-		User:      os.Getenv("DW_SFTP_USER"),
-		KeyFile:   os.Getenv("DW_SFTP_KEY_FILE"),
-		RemoteDir: os.Getenv("DW_SFTP_DIR"),
-		Recipient: os.Getenv("DW_PGP_RECIPIENT"),
+		Host:       os.Getenv("DW_SFTP_HOST"),
+		User:       os.Getenv("DW_SFTP_USER"),
+		KeyFile:    os.Getenv("DW_SFTP_KEY_FILE"),
+		RemoteDir:  os.Getenv("DW_SFTP_DIR"),
+		Recipient:  os.Getenv("DW_PGP_RECIPIENT"),
 		KnownHosts: os.Getenv("DW_KNOWN_HOSTS"),
-		Port:      22,
+		Port:       22,
 	}
 	if c.RemoteDir == "" {
 		c.RemoteDir = "/incoming"
@@ -62,11 +62,11 @@ func FromEnv() (*Config, error) {
 // Target converts the config for the upload package.
 func (c *Config) Target() upload.Target {
 	return upload.Target{
-		Host:      c.Host,
-		Port:      c.Port,
-		User:      c.User,
-		KeyFile:   c.KeyFile,
-		RemoteDir: c.RemoteDir,
+		Host:       c.Host,
+		Port:       c.Port,
+		User:       c.User,
+		KeyFile:    c.KeyFile,
+		RemoteDir:  c.RemoteDir,
 		KnownHosts: c.KnownHosts,
 	}
 }

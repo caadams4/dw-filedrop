@@ -13,11 +13,11 @@ import (
 
 // Target says where and as whom to upload.
 type Target struct {
-	Host      string
-	Port      int
-	User      string
-	KeyFile   string
-	RemoteDir string
+	Host       string
+	Port       int
+	User       string
+	KeyFile    string
+	RemoteDir  string
 	KnownHosts string
 }
 
