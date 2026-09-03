@@ -15,7 +15,7 @@ import (
 	"dw-filedrop/internal/validate"
 )
 
-const version = "1.1.0"
+const version = "1.2.0"
 
 const defaultSchema = "schema/payroll_v5.csv"
 
@@ -127,9 +127,6 @@ func checkFile(path, schemaPath string, out io.Writer) int {
 	if err != nil {
 		fmt.Fprintln(out, "schema:", err)
 		return exitSchema
-	}
-	if s.Version != "5" {
-		fmt.Fprintf(out, "warning: schema v%s is not accepted by Drovewell from 1 Jul 2026\n", s.Version)
 	}
 	f, err := os.Open(path)
 	if err != nil {
