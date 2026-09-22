@@ -26,7 +26,7 @@ func main() {
 func usage(w io.Writer) {
 	fmt.Fprintln(w, "usage: dw-filedrop validate [-schema FILE] FILE.csv")
 	fmt.Fprintln(w, "       dw-filedrop encrypt [-recipient R] FILE.csv")
-	fmt.Fprintln(w, "       dw-filedrop send [-schema FILE] [-dry-run] FILE.csv")
+	fmt.Fprintln(w, "       dw-filedrop send [-schema FILE] [-dry-run] [-keep] FILE.csv")
 }
 
 func run(args []string, out, errw io.Writer) int {
@@ -74,7 +74,7 @@ func cmdEncrypt(args []string, out, errw io.Writer) int {
 		usage(errw)
 		return exitUsage
 	}
-	p, err := encrypt.File(fs.Arg(0), *recipient)
+	p, err := encrypt.File(fs.Arg(0), filepath.Dir(fs.Arg(0)), *recipient)
 	if err != nil {
 		fmt.Fprintln(errw, err)
 		return exitEncrypt
@@ -88,6 +88,7 @@ func cmdSend(args []string, out, errw io.Writer) int {
 	fs.SetOutput(errw)
 	schemaPath := fs.String("schema", defaultSchema, "schema file")
 	dry := fs.Bool("dry-run", false, "validate and check config, then stop")
+	keep := fs.Bool("keep", false, "keep the .pgp next to the input instead of a temp dir")
 	if err := fs.Parse(args); err != nil {
 		return exitUsage
 	}
@@ -108,7 +109,17 @@ func cmdSend(args []string, out, errw io.Writer) int {
 		fmt.Fprintf(out, "dry run: would encrypt for %s and upload to %s:%s\n", cfg.Recipient, cfg.Host, cfg.RemoteDir)
 		return exitOK
 	}
-	enc, err := encrypt.File(path, cfg.Recipient)
+	dir := filepath.Dir(path)
+	if !*keep {
+		tmp, err := os.MkdirTemp("", "dw-")
+		if err != nil {
+			fmt.Fprintln(errw, err)
+			return exitEncrypt
+		}
+		defer os.RemoveAll(tmp)
+		dir = tmp
+	}
+	enc, err := encrypt.File(path, dir, cfg.Recipient)
 	if err != nil {
 		fmt.Fprintln(errw, err)
 		return exitEncrypt
@@ -117,7 +128,6 @@ func cmdSend(args []string, out, errw io.Writer) int {
 		fmt.Fprintln(errw, err)
 		return exitUpload
 	}
-	os.Remove(enc)
 	fmt.Fprintf(out, "sent %s to %s:%s\n", filepath.Base(enc), cfg.Host, cfg.RemoteDir)
 	return exitOK
 }

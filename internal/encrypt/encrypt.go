@@ -6,12 +6,13 @@ import (
 	"bytes"
 	"fmt"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
-// File encrypts in for recipient and returns the path of the .pgp file written next to it.
-func File(in, recipient string) (string, error) {
-	out := in + ".pgp"
+// File encrypts in for recipient and writes <name>.pgp into outDir.
+func File(in, outDir, recipient string) (string, error) {
+	out := filepath.Join(outDir, filepath.Base(in)+".pgp")
 	cmd := exec.Command("gpg", "--batch", "--yes", "--trust-model", "always",
 		"--output", out, "--encrypt", "--recipient", recipient, in)
 	var stderr bytes.Buffer
