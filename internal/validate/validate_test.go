@@ -73,6 +73,15 @@ func TestBOM(t *testing.T) {
 	}
 }
 
+func TestNegativeAdjustment(t *testing.T) {
+	in := "employee_id,surname,forename,country,tax_id,pay_period,pay_date,gross_pay,tax,ee_contrib,er_contrib,cost_centre,pension_scheme\n" +
+		"SO104301,Okafor,Chidi,GB,QQ223344A,2026-10,2026-10-16,-120.00,-24.00,,,CC1040,\n"
+	probs, _, err := Check(strings.NewReader(in), load(t, "payroll_v5.csv"))
+	if err != nil || len(probs) != 0 {
+		t.Fatalf("got %v err=%v", probs, err)
+	}
+}
+
 func TestWrongHeader(t *testing.T) {
 	probs, _, err := Check(strings.NewReader("a,b,c\n1,2,3\n"), load(t, "payroll_v5.csv"))
 	if err != nil {

@@ -16,7 +16,7 @@ import (
 	"dw-filedrop/internal/schema"
 )
 
-var decimalRe = regexp.MustCompile(`^[0-9]+\.[0-9]{2}$`)
+var decimalRe = regexp.MustCompile(`^-?[0-9]+\.[0-9]{2}$`)
 
 // Problem is one thing wrong with one field (or one row).
 type Problem struct {
