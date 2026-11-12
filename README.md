@@ -28,6 +28,9 @@ separate known_hosts file.
 
 Needs `gpg` and `sftp` on PATH.
 
+send encrypts into a temp dir and uploads as `<file>.pgp.part`, then renames.
+Tries 3 times with a pause between (5s, then 20s). Exit 6 only after all three fail.
+
 ## Exit codes
 
 | code | meaning |
